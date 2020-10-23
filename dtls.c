@@ -989,6 +989,12 @@ dtls_update_parameters(dtls_context_t *ctx,
     return 0;
   }
 
+  /* cipher length should be even*/
+  if (i % sizeof(uint16_t)) {
+    dtls_warn("Invalid cipher suite length\n");
+    goto error;
+  }
+
   data += sizeof(uint16_t);
   data_length -= sizeof(uint16_t) + i;
 
@@ -1027,7 +1033,7 @@ dtls_update_parameters(dtls_context_t *ctx,
   data_length -= sizeof(uint8_t) + i;
 
   ok = 0;
-  while (i && !ok) {
+  while (i >= sizeof(uint8_t) && !ok) {
     for (j = 0; j < sizeof(compression_methods) / sizeof(uint8_t); ++j)
       if (dtls_uint8_to_int(data) == compression_methods[j]) {
 	config->compression = compression_methods[j];
