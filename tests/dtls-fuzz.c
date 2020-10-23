@@ -199,28 +199,6 @@ void make_dirs(char *path) {
   }
 }
 
-// populate peer details
-void populate_peer(struct dtls_context_t *ctx, session_t* session) {
-  dtls_peer_t *peer;
-  dtls_handshake_parameters_t *handshake_params;
-  handshake_params = dtls_handshake_new();
-  handshake_params->hs_state.mseq_s = 1;
-  handshake_params->hs_state.mseq_r = 0;
-  handshake_params->compression = TLS_COMPRESSION_NULL;
-  handshake_params->cipher = TLS_NULL_WITH_NULL_NULL;
-  handshake_params->do_client_auth = 0;
-  strcpy(handshake_params->keyx.psk.identity, PSK_IDENTITY);
-  handshake_params->keyx.psk.id_length = PSK_IDENTITY_LEN;
-
-  peer = dtls_new_peer(session);
-  peer->role = DTLS_CLIENT;
-  peer->state = DTLS_STATE_CLIENTHELLO;
-  peer->handshake_params = handshake_params;
-  if (dtls_add_peer(ctx, peer) < 0) {
-    dtls_alert("cannot add peer\n");
-  }
-}
-
 static uint8_t start_rec [] = {0x16, 0xfe, 0xfd};
 static size_t start_rec_len = 3;
 
@@ -354,7 +332,6 @@ int fuzz_file(const uint8_t *record, size_t size, char* crypt, int packet_order)
   populate_sockaddr((struct sockaddr_in *)&session.addr.sa);
   // this should kick-start the client
   dtls_connect(the_client_context, &session);
-  populate_peer(the_client_context, &session);
 
   for (int i=0; i<no_of_msg; i++) {
     sprintf(file_name, "%s%d", base_name, i);
