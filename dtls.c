@@ -322,6 +322,9 @@ dtls_create_cookie(dtls_context_t *ctx,
   if (e + DTLS_HS_LENGTH > msglen)
     return dtls_alert_fatal_create(DTLS_ALERT_HANDSHAKE_FAILURE);
 
+  if(e > dtls_get_fragment_length(DTLS_HANDSHAKE_HEADER(msg))) 
+    return dtls_alert_fatal_create(DTLS_ALERT_HANDSHAKE_FAILURE);
+
   dtls_hmac_update(&hmac_context, 
 		   msg + DTLS_HS_LENGTH + e,
 		   dtls_get_fragment_length(DTLS_HANDSHAKE_HEADER(msg)) - e);
