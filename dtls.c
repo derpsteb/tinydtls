@@ -1624,6 +1624,7 @@ dtls_verify_peer(dtls_context_t *ctx,
   /* Perform cookie check. */
   len = dtls_get_cookie(data, data_length, &cookie);
   if (len < 0) {
+    err = len;
     dtls_warn("error while fetching the cookie, err: %i\n", err);
     return err;
   }
