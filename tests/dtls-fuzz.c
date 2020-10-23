@@ -370,7 +370,7 @@ int fuzz_file(const uint8_t *record, size_t size, char* crypt, int packet_order)
       }
       f = NULL;
     } else {
-        memcpy(buf, record, size+1);
+        memcpy(buf, record, size);
         len = size;
     }
 
