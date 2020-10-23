@@ -322,12 +322,9 @@ dtls_create_cookie(dtls_context_t *ctx,
   if (e + DTLS_HS_LENGTH > msglen)
     return dtls_alert_fatal_create(DTLS_ALERT_HANDSHAKE_FAILURE);
 
-  if(e > dtls_get_fragment_length(DTLS_HANDSHAKE_HEADER(msg))) 
-    return dtls_alert_fatal_create(DTLS_ALERT_HANDSHAKE_FAILURE);
-
   dtls_hmac_update(&hmac_context, 
 		   msg + DTLS_HS_LENGTH + e,
-		   dtls_get_fragment_length(DTLS_HANDSHAKE_HEADER(msg)) - e);
+		   msglen - DTLS_HS_LENGTH - e);
 
   len = dtls_hmac_finalize(&hmac_context, buf);
 
@@ -3555,6 +3552,11 @@ handle_handshake(dtls_context_t *ctx, dtls_peer_t *peer, session_t *session,
     return dtls_alert_fatal_create(DTLS_ALERT_DECODE_ERROR);
   }
   hs_header = DTLS_HANDSHAKE_HEADER(data);
+
+  if (data_length - DTLS_HS_LENGTH != dtls_get_fragment_length(hs_header)) {
+    dtls_warn("fragment length field does not match the actual length of the fragment\n");
+    return dtls_alert_fatal_create(DTLS_ALERT_DECODE_ERROR);
+  }
 
   dtls_debug("received handshake packet of type: %s (%i)\n",
 	     dtls_handshake_type_to_name(hs_header->msg_type), hs_header->msg_type);
