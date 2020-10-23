@@ -3292,6 +3292,10 @@ handle_handshake_msg(dtls_context_t *ctx, dtls_peer_t *peer, session_t *session,
       return dtls_alert_fatal_create(DTLS_ALERT_UNEXPECTED_MESSAGE);
     }
 
+    if (!is_tls_ecdhe_ecdsa_with_aes_128_ccm_8(peer->handshake_params->cipher)) {
+      return dtls_alert_fatal_create(DTLS_ALERT_UNEXPECTED_MESSAGE);
+    }
+
     err = check_certificate_request(ctx, peer, data, data_length);
     if (err < 0) {
       dtls_warn("error in check_certificate_request err: %i\n", err);
