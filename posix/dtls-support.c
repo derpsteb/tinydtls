@@ -112,22 +112,23 @@ dtls_ticks(dtls_tick_t *t)
 int
 dtls_fill_random(uint8_t *buf, size_t len)
 {
-  FILE *urandom = fopen("/dev/urandom", "r");
-
-  if(!urandom) {
-    dtls_emerg("cannot initialize random\n");
-    return 0;
-  }
-
-  if(fread(buf, 1, len, urandom) != len) {
-    dtls_emerg("cannot fill random\n");
-    fclose(urandom);
-    return 0;
-  }
-
-  fclose(urandom);
-
   // Fuzzing change
+  
+  // FILE *urandom = fopen("/dev/urandom", "r");
+
+  // if(!urandom) {
+  //   dtls_emerg("cannot initialize random\n");
+  //   return 0;
+  // }
+
+  // if(fread(buf, 1, len, urandom) != len) {
+  //   dtls_emerg("cannot fill random\n");
+  //   fclose(urandom);
+  //   return 0;
+  // }
+
+  // fclose(urandom);
+
   for(int i=0; i<len; i++) {
     buf[i] = 1;
   }
